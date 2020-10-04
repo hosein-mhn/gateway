@@ -51,15 +51,16 @@ class Pasargad extends PortAbstract implements PortInterface
      */
     public function redirect()
     {
+        $table = DB::table('pasargad')->where('user_id', $this->userid)->first();
 
-        $processor = new RSAProcessor($this->config->get('gateway.pasargad.certificate-path'), RSAKeyType::XMLFile);
+        $processor = new RSAProcessor($table->certificate_path, RSAKeyType::XMLFile);
 
         $url = $this->gateUrl;
         $redirectUrl = $this->getCallback();
         $invoiceNumber = $this->transactionId();
         $amount = $this->amount;
-        $terminalCode = $this->config->get('gateway.pasargad.terminalId');
-        $merchantCode = $this->config->get('gateway.pasargad.merchantId');
+        $terminalCode = $table->terminalId;
+        $merchantCode = $table->merchantId;
         $timeStamp = date("Y/m/d H:i:s");
         $invoiceDate = date("Y/m/d H:i:s");
         $action = 1003;
@@ -100,8 +101,10 @@ class Pasargad extends PortAbstract implements PortInterface
      */
     function getCallback()
     {
+        $table = DB::table('pasargad')->where('user_id', $this->userid)->first();
+
         if (!$this->callbackUrl)
-            $this->callbackUrl = $this->config->get('gateway.pasargad.callback-url');
+            $this->callbackUrl = $table->callback_url;
 
         return $this->callbackUrl;
     }
@@ -155,9 +158,11 @@ class Pasargad extends PortAbstract implements PortInterface
      */
     protected function callVerifyPayment($data)
     {
-        $processor = new RSAProcessor($this->config->get('gateway.pasargad.certificate-path'), RSAKeyType::XMLFile);
-        $merchantCode = $this->config->get('gateway.pasargad.merchantId');
-        $terminalCode = $this->config->get('gateway.pasargad.terminalId');
+        $table = DB::table('pasargad')->where('user_id', $this->userid)->first();
+
+        $processor = new RSAProcessor($table->certificate_path, RSAKeyType::XMLFile);
+        $merchantCode = $table->merchantId;
+        $terminalCode = $table->terminalId;
         $invoiceNumber = $data['invoiceNumber'];
         $invoiceDate = $data['invoiceDate'];
         $timeStamp = date("Y/m/d H:i:s");

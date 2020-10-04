@@ -75,8 +75,10 @@ class Asanpardakht extends PortAbstract implements PortInterface
      */
     function getCallback()
     {
+        $table = DB::table('asanpardakht')->where('user_id', $this->userid)->first();
+
         if (!$this->callbackUrl)
-            $this->callbackUrl = $this->config->get('gateway.asanpardakht.callback-url');
+            $this->callbackUrl = $table->callback_url;
 
         $url = $this->makeCallback($this->callbackUrl, ['transaction_id' => $this->transactionId()]);
 
@@ -94,8 +96,10 @@ class Asanpardakht extends PortAbstract implements PortInterface
     {
         $this->newTransaction();
 
-        $username = $this->config->get('gateway.asanpardakht.username');
-        $password = $this->config->get('gateway.asanpardakht.password');
+        $table = DB::table('asanpardakht')->where('user_id', $this->userid)->first();
+
+        $username = $table->username;
+        $password = $table->password;
         $orderId = $this->transactionId();
         $price = $this->amount;
         $localDate = date("Ymd His");
@@ -105,7 +109,7 @@ class Asanpardakht extends PortAbstract implements PortInterface
 
         $encryptedRequest = $this->encrypt($req);
         $params = array(
-            'merchantConfigurationID' => $this->config->get('gateway.asanpardakht.merchantConfigId'),
+            'merchantConfigurationID' => $table->merchantConfigId,
             'encryptedRequest' => $encryptedRequest
         );
 
@@ -181,8 +185,11 @@ class Asanpardakht extends PortAbstract implements PortInterface
     protected function verifyAndSettlePayment()
     {
 
-        $username = $this->config->get('gateway.asanpardakht.username');
-        $password = $this->config->get('gateway.asanpardakht.password');
+
+        $table = DB::table('asanpardakht')->where('user_id', $this->userid)->first();
+
+        $username = $table->username;
+        $password = $table->password;
 
         $encryptedCredintials = $this->encrypt("{$username},{$password}");
         $params = array(
@@ -238,9 +245,10 @@ class Asanpardakht extends PortAbstract implements PortInterface
      */
     private function encrypt($string = "")
     {
+        $table = DB::table('asanpardakht')->where('user_id', $this->userid)->first();
 
-        $key = $this->config->get('gateway.asanpardakht.key');
-        $iv = $this->config->get('gateway.asanpardakht.iv');
+        $key = $table->key;
+        $iv = $table->iv;
 
         try {
 
@@ -268,8 +276,10 @@ class Asanpardakht extends PortAbstract implements PortInterface
      */
     private function decrypt($string = "")
     {
-        $key = $this->config->get('gateway.asanpardakht.key');
-        $iv = $this->config->get('gateway.asanpardakht.iv');
+        $table = DB::table('asanpardakht')->where('user_id', $this->userid)->first();
+
+        $key = $table->key;
+        $iv = $table->iv;
 
         try {
 

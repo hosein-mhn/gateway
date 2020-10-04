@@ -78,8 +78,10 @@ class Mellat extends PortAbstract implements PortInterface
 	 */
 	function getCallback()
 	{
+        $table = DB::table('mellat')->where('user_id', $this->userid)->first();
+
 		if (!$this->callbackUrl)
-			$this->callbackUrl = $this->config->get('gateway.mellat.callback-url');
+			$this->callbackUrl = $table->callback_url;
 
 		return $this->makeCallback($this->callbackUrl, ['transaction_id' => $this->transactionId()]);
 	}

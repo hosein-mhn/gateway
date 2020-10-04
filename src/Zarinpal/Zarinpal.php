@@ -111,7 +111,9 @@ class Zarinpal extends PortAbstract implements PortInterface
 	 */
 	public function redirect()
 	{
-		switch ($this->config->get('gateway.zarinpal.type')) {
+        $table = DB::table('zarinpal')->where('user_id', $this->userid)->first();
+
+		switch ($table->type) {
 			case 'zarin-gate':
 				return \Redirect::to(str_replace('$Authority', $this->refId, $this->zarinGateUrl));
 				break;
@@ -152,8 +154,10 @@ class Zarinpal extends PortAbstract implements PortInterface
 	 */
 	function getCallback()
 	{
+        $table = DB::table('zarinpal')->where('user_id', $this->userid)->first();
+
 		if (!$this->callbackUrl)
-			$this->callbackUrl = $this->config->get('gateway.zarinpal.callback-url');
+			$this->callbackUrl = $table->callback_url;
 
 		return $this->makeCallback($this->callbackUrl, ['transaction_id' => $this->transactionId()]);
 	}
@@ -167,15 +171,16 @@ class Zarinpal extends PortAbstract implements PortInterface
 	 */
 	protected function sendPayRequest()
 	{
+        $table = DB::table('zarinpal')->where('user_id', $this->userid)->first();
 		$this->newTransaction();
 
 		$fields = array(
-			'MerchantID' => $this->config->get('gateway.zarinpal.merchant-id'),
+			'MerchantID' => $table->merchant_id,
 			'Amount' => $this->amount,
 			'CallbackURL' => $this->getCallback(),
-			'Description' => $this->description ? $this->description : $this->config->get('gateway.zarinpal.description', ''),
-			'Email' => $this->email ? $this->email :$this->config->get('gateway.zarinpal.email', ''),
-			'Mobile' => $this->mobileNumber ? $this->mobileNumber : $this->config->get('gateway.zarinpal.mobile', ''),
+			'Description' => $table->description,
+            'Email' => $table->email,
+            'Mobile' => $table->mobile,
 		);
 
 		try {
@@ -228,9 +233,9 @@ class Zarinpal extends PortAbstract implements PortInterface
 	 */
 	protected function verifyPayment()
 	{
-
+        $table = DB::table('zarinpal')->where('user_id', $this->userid)->first();
 		$fields = array(
-			'MerchantID' => $this->config->get('gateway.zarinpal.merchant-id'),
+			'MerchantID' => $table->merchant_id,
 			'Authority' => $this->refId,
 			'Amount' => $this->amount,
 		);
@@ -264,8 +269,9 @@ class Zarinpal extends PortAbstract implements PortInterface
 	 */
 	protected function setServer()
 	{
-		$server = $this->config->get('gateway.zarinpal.server', 'germany');
-		switch ($server) {
+        $table = DB::table('zarinpal')->where('user_id', $this->userid)->first();
+
+        switch ($table->server){
 			case 'iran':
 				$this->serverUrl = $this->iranServer;
 				break;

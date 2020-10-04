@@ -98,8 +98,10 @@ class Payir extends PortAbstract implements PortInterface
      */
     function getCallback()
     {
+        $table = DB::table('payir')->where('user_id', $this->userid)->first();
+
         if (!$this->callbackUrl)
-            $this->callbackUrl = $this->config->get('gateway.payir.callback-url');
+            $this->callbackUrl = $table->callback_url;
         return urlencode($this->makeCallback($this->callbackUrl, ['transaction_id' => $this->transactionId()]));
     }
 
@@ -112,9 +114,12 @@ class Payir extends PortAbstract implements PortInterface
      */
     protected function sendPayRequest()
     {
+
+        $table = DB::table('payir')->where('user_id', $this->userid)->first();
+
         $this->newTransaction();
         $fields = [
-            'api'      => $this->config->get('gateway.payir.api'),
+            'api'      => $table->api,
             'amount'   => $this->amount,
             'redirect' => $this->getCallback(),
         ];
@@ -171,8 +176,11 @@ class Payir extends PortAbstract implements PortInterface
      */
     protected function verifyPayment()
     {
+
+        $table = DB::table('payir')->where('user_id', $this->userid)->first();
+
         $fields = [
-            'api'     => $this->config->get('gateway.payir.api'),
+            'api'     => $table->api,
             'transId' => $this->refId(),
         ];
         $ch = curl_init();

@@ -66,9 +66,12 @@ class Saman extends PortAbstract implements PortInterface
      */
     public function redirect()
     {
+
+        $table = DB::table('saman')->where('user_id', $this->userid)->first();
+
         $main_data = [
             'amount'        => $this->amount,
-            'merchant'      => $this->config->get('gateway.saman.merchant'),
+            'merchant'      => $table->merchant,
             'resNum'        => $this->transactionId(),
             'callBackUrl'   => $this->getCallback()
         ];
@@ -107,8 +110,11 @@ class Saman extends PortAbstract implements PortInterface
      */
     function getCallback()
     {
+
+        $table = DB::table('saman')->where('user_id', $this->userid)->first();
+
         if (!$this->callbackUrl)
-            $this->callbackUrl = $this->config->get('gateway.saman.callback-url');
+            $this->callbackUrl = $table->callback_url;
 
         $url = $this->makeCallback($this->callbackUrl, ['transaction_id' => $this->transactionId()]);
 
@@ -158,10 +164,13 @@ class Saman extends PortAbstract implements PortInterface
      */
     protected function verifyPayment()
     {
+
+        $table = DB::table('saman')->where('user_id', $this->userid)->first();
+
         $fields = array(
-            "merchantID" => $this->config->get('gateway.saman.merchant'),
+            "merchantID" => $table->merchant,
             "RefNum" => $this->refId,
-            "password" => $this->config->get('gateway.saman.password'),
+            "password" => $table->password,
         );
 
         try {

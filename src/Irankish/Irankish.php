@@ -49,9 +49,11 @@ class Irankish extends PortAbstract implements PortInterface
      */
     public function redirect()
     {
+        $table = DB::table('irankish')->where('user_id', $this->userid)->first();
+
         $gateUrl     = $this->gateUrl;
         $token      = $this->refId;
-        $merchantId = $this->config->get('gateway.irankish.merchantId');
+        $merchantId = $table->merchantId;
 
         return view('gateway::irankish-redirector')->with(compact('token', 'merchantId','gateUrl'));
     }
@@ -86,8 +88,10 @@ class Irankish extends PortAbstract implements PortInterface
      */
     function getCallback()
     {
+        $table = DB::table('irankish')->where('user_id', $this->userid)->first();
+
         if (!$this->callbackUrl) {
-            $this->callbackUrl = $this->config->get('gateway.irankish.callback-url');
+            $this->callbackUrl = $table->callback_url;
         }
 
         return $this->makeCallback($this->callbackUrl, ['transaction_id' => $this->transactionId()]);
@@ -106,9 +110,11 @@ class Irankish extends PortAbstract implements PortInterface
 
         $this->newTransaction();
 
+        $table = DB::table('irankish')->where('user_id', $this->userid)->first();
+
         $fields = [
             'amount'           => $this->amount,
-            'merchantId'       => $this->config->get('gateway.irankish.merchantId'),
+            'merchantId'       => $table->merchantId,
             'invoiceNo'        => $this->transactionId(),
             'paymentId'        => $this->getCustomInvoiceNo(),
             'revertURL'        => $this->getCallback(),
@@ -169,11 +175,13 @@ class Irankish extends PortAbstract implements PortInterface
      */
     protected function verifyPayment()
     {
+        $table = DB::table('irankish')->where('user_id', $this->userid)->first();
+
         $fields = [
             'token'       => $this->refId(),
-            'merchantId'  => $this->config->get('gateway.irankish.merchantId'),
+            'merchantId'  => $table->merchantId,
             'referenceNumber' => $this->trackingCode(),
-            'sha1key'         => $this->config->get('gateway.irankish.sha1key')
+            'sha1key'         => $table->sha1key
         ];
 
         try {

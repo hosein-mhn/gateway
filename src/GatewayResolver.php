@@ -28,6 +28,13 @@ class GatewayResolver
 	 */
 	public $config;
 
+
+	public $id;
+
+	public function user_id($id){
+	    $this->id = $id;
+    }
+
 	/**
 	 * Keep current port driver
 	 *
@@ -96,7 +103,7 @@ class GatewayResolver
 	 * @throws PortNotFoundException
 	 * @throws RetryException
 	 */
-	public function verify()
+	public function verify($user_id)
 	{
 		if (!$this->request->has('transaction_id') && !$this->request->has('iN'))
 			throw new InvalidRequestException;
@@ -114,7 +121,7 @@ class GatewayResolver
 		if (in_array($transaction->status, [Enum::TRANSACTION_SUCCEED, Enum::TRANSACTION_FAILED]))
 			throw new RetryException;
 
-		$this->make($transaction->port);
+		$this->make($transaction->port,$user_id);
 
 		return $this->port->verify($transaction);
 	}
@@ -126,7 +133,7 @@ class GatewayResolver
 	 * @param int $port
 	 * @throws PortNotFoundException
 	 */
-	function make($port)
+	function make($port,$user_id)
     {
         if ($port InstanceOf Mellat) {
             $name = Enum::MELLAT;
@@ -156,9 +163,12 @@ class GatewayResolver
         } else
             throw new PortNotFoundException;
 
+        $this->user_id($user_id);
+
         $this->port = $port;
         $this->port->setConfig($this->config); // injects config
         $this->port->setPortName($name); // injects config
+        $this->port->setUserId($this->id);
         $this->port->boot();
 
         return $this;

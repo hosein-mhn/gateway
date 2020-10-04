@@ -14,6 +14,10 @@ abstract class PortAbstract
 	 */
 	protected $transactionId = null;
 
+
+	protected $userid;
+
+
 	/**
 	 * Transaction row in database
 	 */
@@ -127,6 +131,18 @@ abstract class PortAbstract
 	{
 		return $this->portName;
 	}
+
+
+    function setUserId($user_id)
+    {
+        $this->userid = $user_id;
+    }
+
+    function getUserId()
+    {
+        return $this->userid;
+    }
+
 
 	/**
 	 * Get port id, $this->port

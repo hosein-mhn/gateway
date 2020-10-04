@@ -81,8 +81,10 @@ class Sadad extends PortAbstract implements PortInterface
 	 */
 	function getCallback()
 	{
+        $table = DB::table('sadad')->where('user_id', $this->userid)->first();
+
 		if (!$this->callbackUrl)
-			$this->callbackUrl = $this->config->get('gateway.sadad.callback-url');
+			$this->callbackUrl = $table->callback_url;
 
 		return $this->makeCallback($this->callbackUrl, ['transaction_id' => $this->transactionId()]);
 	}
@@ -100,15 +102,17 @@ class Sadad extends PortAbstract implements PortInterface
 
 		$this->form = '';
 
+        $table = DB::table('sadad')->where('user_id', $this->userid)->first();
+
 		try {
 			$soap = new SoapClient($this->serverUrl);
 
 			$response = $soap->PaymentUtility(
-				$this->config->get('gateway.sadad.merchant'),
+                $table->merchant,
 				$this->amount,
 				$this->transactionId(),
-				$this->config->get('gateway.sadad.transactionKey'),
-				$this->config->get('gateway.sadad.terminalId'),
+                $table->transactionKey,
+                $table->terminalId,
 				$this->getCallback()
 			);
 
@@ -137,14 +141,17 @@ class Sadad extends PortAbstract implements PortInterface
 	 */
 	protected function verifyPayment()
 	{
+
+        $table = DB::table('sadad')->where('user_id', $this->userid)->first();
+
 		try {
 			$soap = new SoapClient($this->serverUrl);
 
 			$result = $soap->CheckRequestStatusResult(
 				$this->transactionId(),
-				$this->config->get('gateway.sadad.merchant'),
-				$this->config->get('gateway.sadad.terminalId'),
-				$this->config->get('gateway.sadad.transactionKey'),
+                $table->merchant,
+                $table->terminalId,
+                $table->transactionKey,
 				$this->refId(),
 				$this->amount
 			);
