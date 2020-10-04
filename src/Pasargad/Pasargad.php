@@ -7,6 +7,7 @@ use Larabookir\Gateway\Enum;
 use Larabookir\Gateway\Parsian\ParsianErrorException;
 use Larabookir\Gateway\PortAbstract;
 use Larabookir\Gateway\PortInterface;
+use Illuminate\Support\Facades\DB;
 
 class Pasargad extends PortAbstract implements PortInterface
 {

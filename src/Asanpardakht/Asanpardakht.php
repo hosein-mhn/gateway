@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Request;
 use SoapClient;
 use Larabookir\Gateway\PortAbstract;
 use Larabookir\Gateway\PortInterface;
+use Illuminate\Support\Facades\DB;
 
 class Asanpardakht extends PortAbstract implements PortInterface
 {

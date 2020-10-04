@@ -5,6 +5,7 @@ namespace Larabookir\Gateway\Sadad;
 use SoapClient;
 use Larabookir\Gateway\PortAbstract;
 use Larabookir\Gateway\PortInterface;
+use Illuminate\Support\Facades\DB;
 
 class Sadad extends PortAbstract implements PortInterface
 {

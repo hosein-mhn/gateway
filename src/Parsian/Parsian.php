@@ -7,6 +7,7 @@ use Illuminate\Validation\Rules\In;
 use SoapClient;
 use Larabookir\Gateway\PortAbstract;
 use Larabookir\Gateway\PortInterface;
+use Illuminate\Support\Facades\DB;
 
 class Parsian extends PortAbstract implements PortInterface
 {
